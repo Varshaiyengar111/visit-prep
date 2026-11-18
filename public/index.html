@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Visit Prep</title>
+<style>
+  :root { --bg:#f7f7f4; --card:#fff; --ink:#1d2421; --muted:#5d6762; --line:#e2e4df; --accent:#1f7a5c; --warn-bg:#fff4e5; --warn:#8a4b00; --danger-bg:#fdecec; --danger:#9b1c1c; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#141816; --card:#1d2321; --ink:#e8ece9; --muted:#a2aca6; --line:#2e3632; --accent:#5cc79f; --warn-bg:#3a2a12; --warn:#ffcf8a; --danger-bg:#3d1717; --danger:#ffb3b3; } }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 24px 16px 48px; }
+  h1 { margin: 0 0 4px; font-size: 1.6rem; }
+  h2 { font-size: 1.05rem; margin: 20px 0 8px; }
+  p.lede { margin: 0 0 16px; color: var(--muted); }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin-top: 16px; }
+  textarea { width: 100%; min-height: 200px; font: inherit; padding: 12px; border-radius: 8px; border: 1px solid var(--line); background: var(--bg); color: var(--ink); }
+  button { font: inherit; padding: 10px 16px; border-radius: 8px; border: 0; background: var(--accent); color: #fff; cursor: pointer; }
+  button.secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+  button:disabled { opacity: .6; cursor: wait; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .note { font-size: .9rem; color: var(--muted); }
+  .banner { padding: 10px 12px; border-radius: 8px; background: var(--warn-bg); color: var(--warn); font-size: .92rem; margin-top: 12px; }
+  .urgent { padding: 12px; border-radius: 8px; background: var(--danger-bg); color: var(--danger); margin-top: 16px; }
+  .urgent strong { display: block; margin-bottom: 4px; }
+  table { width: 100%; border-collapse: collapse; font-size: .95rem; }
+  th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; }
+  ul { margin: 0; padding-left: 20px; }
+  .table-wrap { overflow-x: auto; }
+  footer { margin-top: 24px; font-size: .85rem; color: var(--muted); }
+  @media print { textarea, .row, .banner, footer, #inputCard { display: none !important; } body { background: #fff; color: #000; } .card { border: 0; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Visit Prep</h1>
+  <p class="lede">Turn rough notes about how you've been feeling into a one-page summary for your doctor. It organises what you wrote. It does not diagnose or give medical advice.</p>
+
+  <div class="card" id="inputCard">
+    <label for="diary"><strong>Your notes</strong> <span class="note">(use made-up text when trying this demo)</span></label>
+    <textarea id="diary" placeholder="e.g. Mon - headache in the evening..."></textarea>
+    <div class="row">
+      <button id="go">Make my summary</button>
+      <button class="secondary" id="sample">Use example notes</button>
+    </div>
+    <div id="mode" class="note" style="margin-top:8px"></div>
+  </div>
+
+  <div id="urgent" class="urgent" hidden>
+    <strong>Your notes mention something that may need help right away.</strong>
+    Please don't wait for your appointment. In an emergency call <b>112</b>. For mental health support call Tele-MANAS on <b>14416</b> (free, 24×7).
+  </div>
+
+  <div id="error" class="banner" hidden></div>
+  <div id="out" class="card" hidden></div>
+
+  <footer>Visit Prep is a portfolio demo. It is not a medical device and does not replace a doctor. Example data is made up.</footer>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+let sample = "";
+
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+const list = (items) => items.length ? `<ul>${items.map((i) => `<li>${esc(i)}</li>`).join("")}</ul>` : `<p class="note">Nothing noted.</p>`;
+
+fetch("/api/status").then((r) => r.json()).then((s) => {
+  sample = s.sample.diary;
+  $("mode").textContent = s.live ? "Live AI mode." : "Demo mode: shows a pre-made example summary. Add an API key to use the real AI.";
+});
+
+$("sample").onclick = () => { $("diary").value = sample; };
+
+$("go").onclick = async () => {
+  $("go").disabled = true; $("go").textContent = "Working…";
+  $("error").hidden = true;
+  try {
+    const r = await fetch("/api/run", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ diary: $("diary").value }) });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error);
+    $("urgent").hidden = !data.urgent;
+    render(data);
+  } catch (e) {
+    $("error").textContent = e.message; $("error").hidden = false;
+  } finally {
+    $("go").disabled = false; $("go").textContent = "Make my summary";
+  }
+};
+
+function render({ demo, result: s }) {
+  $("out").hidden = false;
+  $("out").innerHTML = `
+    ${demo ? `<div class="banner" style="margin-top:0">Demo mode: this is a pre-made summary of the example notes. It doesn't read what you type.</div>` : ""}
+    <h2>What I want to talk about</h2>${list(s.main_concerns)}
+    <h2>Symptoms</h2>
+    <div class="table-wrap"><table>
+      <tr><th>Symptom</th><th>When</th><th>How often</th><th>In my words</th></tr>
+      ${s.symptoms.map((x) => `<tr><td>${esc(x.symptom)}</td><td>${esc(x.when)}</td><td>${esc(x.how_often)}</td><td>“${esc(x.patient_words)}”</td></tr>`).join("")}
+    </table></div>
+    <h2>Medicines I mentioned</h2>${list(s.medicines_mentioned)}
+    <h2>What seemed to help</h2>${list(s.what_helped)}
+    <h2>Things I wasn't clear about</h2>${list(s.unclear_points)}
+    <h2>Questions for my doctor</h2>${list(s.questions_for_doctor)}
+    <div class="row"><button class="secondary" onclick="window.print()">Print or save as PDF</button></div>`;
+}
+</script>
+</body>
+</html>

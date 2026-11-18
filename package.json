@@ -1,0 +1,16 @@
+{
+  "name": "visit-prep",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Turns a patient's rough symptom diary into a one-page summary for their doctor. No diagnosis, no advice.",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=20.12"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.10.0"
+  }
+}
