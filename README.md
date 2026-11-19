@@ -2,6 +2,9 @@
 
 **Turn a messy symptom diary into a one-page summary a doctor can read in 60 seconds.**
 
+### ▶ [Try the online demo](https://varshaiyengar111.github.io/visit-prep/)
+No install needed. It shows the built-in example and never calls the AI.
+
 A small AI product prototype in health tech. A patient types rough notes about how they've felt. Visit Prep organises them into symptoms, timing, medicines mentioned and questions to ask. It never diagnoses and never gives advice.
 
 > Portfolio demo. Not a medical device. All example data is made up.
@@ -66,6 +69,8 @@ Open http://localhost:3001 and click **Use example notes**, then **Make my summa
 
 - **Demo mode (free):** with no key, it shows a pre-made example summary.
 - **Live AI mode:** copy `.env.example` to `.env`, paste an [Anthropic API key](https://console.anthropic.com) after `ANTHROPIC_API_KEY=`, and restart. The key stays on your computer's server and is never sent to the browser. `.env` is in `.gitignore`, so it is never uploaded.
+
+**Online demo:** the version on GitHub Pages is built from the `public` page with `npm run build:pages`, which saves the built-in example into `docs/`. It has no server and no key, so it never calls the AI.
 
 ## How it works
 

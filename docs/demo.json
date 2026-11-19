@@ -1,0 +1,81 @@
+{
+  "status": {
+    "live": false,
+    "model": null,
+    "sample": {
+      "diary": "Mon - headache again in the evening, behind my eyes. Took a paracetamol, slept badly.\nTue - fine in the morning. Headache came back after office around 6pm. Had only 2 glasses of water today.\nThu - woke up tired. Headache at lunch, screen work all day. Dizzy for a few seconds when I stood up quickly.\nSat - no headache! Went for a walk, drank more water.\nSun - mild headache at night. Mom says I'm on my phone too late. Worried it's something serious.\nAlso my left knee has been stiff in the mornings for 2 weeks but goes away after I move around."
+    }
+  },
+  "run": {
+    "demo": true,
+    "urgent": false,
+    "urgentWords": [],
+    "result": {
+      "main_concerns": [
+        "Headaches on most days this week, usually in the evening",
+        "Worried the headaches might be something serious",
+        "Left knee stiff in the mornings for about 2 weeks"
+      ],
+      "symptoms": [
+        {
+          "symptom": "Headache",
+          "when": "Evenings and after office; once at lunch",
+          "how_often": "5 of the 6 days noted",
+          "patient_words": "headache again in the evening, behind my eyes"
+        },
+        {
+          "symptom": "Tiredness and poor sleep",
+          "when": "Monday night; Thursday morning",
+          "how_often": "2 days noted",
+          "patient_words": "slept badly"
+        },
+        {
+          "symptom": "Dizziness on standing",
+          "when": "Thursday",
+          "how_often": "Once, for a few seconds",
+          "patient_words": "Dizzy for a few seconds when I stood up quickly"
+        },
+        {
+          "symptom": "Knee stiffness (left)",
+          "when": "Mornings",
+          "how_often": "Daily for about 2 weeks",
+          "patient_words": "stiff in the mornings ... goes away after I move around"
+        }
+      ],
+      "medicines_mentioned": [
+        "Paracetamol (Monday)"
+      ],
+      "what_helped": [
+        "Saturday: walk and more water, no headache that day"
+      ],
+      "unclear_points": [
+        "How many paracetamol tablets were taken, and on which other days",
+        "Whether the headache on Sunday was the same kind as the others"
+      ],
+      "questions_for_doctor": [
+        "What could be causing my headaches?",
+        "Could my screen time, sleep or water intake be related?",
+        "Is the dizziness when I stand up something to watch?",
+        "What should I do about the morning stiffness in my knee?"
+      ]
+    }
+  },
+  "urgentWords": [
+    "chest pain",
+    "can't breathe",
+    "cannot breathe",
+    "faint",
+    "fainted",
+    "unconscious",
+    "suicide",
+    "kill myself",
+    "end my life",
+    "self harm",
+    "self-harm",
+    "worst headache",
+    "slurred",
+    "numb face",
+    "seizure",
+    "blood in vomit"
+  ]
+}

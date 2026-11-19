@@ -5,7 +5,8 @@
   "description": "Turns a patient's rough symptom diary into a one-page summary for their doctor. No diagnosis, no advice.",
   "type": "module",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "build:pages": "node build-pages.js"
   },
   "engines": {
     "node": ">=20.12"

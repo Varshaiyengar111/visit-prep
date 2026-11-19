@@ -20,6 +20,7 @@ export default {
   name: "Visit Prep",
   port: 3001,
   sampleInput: { diary: sampleDiary },
+  urgentWords: URGENT_WORDS,
 
   validate(input) {
     if (typeof input.diary !== "string" || input.diary.trim().length < 20) {

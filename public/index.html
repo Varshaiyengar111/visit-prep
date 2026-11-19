@@ -59,14 +59,38 @@
 </main>
 <script>
 const $ = (id) => document.getElementById(id);
+
+// On GitHub Pages there is no server, so the page uses the built-in example in demo.json.
+// Add ?static to the address to try this mode on your own computer.
+const STATIC = location.hostname.endsWith("github.io") || new URLSearchParams(location.search).has("static");
+const ONLINE_NOTE = "Online demo: shows a pre-made example and never uses AI. To try the real AI, run it on your computer (see the README).";
+let demoFile;
+async function api(path, body) {
+  if (STATIC) {
+    demoFile ??= await fetch("demo.json").then((r) => r.json());
+    if (path === "status") return demoFile.status;
+    const run = structuredClone(demoFile.run);
+    if (demoFile.urgentWords) {
+      // The urgent-help check still runs on what the visitor typed.
+      const text = Object.values(body).join(" ").toLowerCase();
+      run.urgentWords = demoFile.urgentWords.filter((w) => text.includes(w));
+      run.urgent = run.urgentWords.length > 0;
+    }
+    return run;
+  }
+  const r = await fetch("/api/" + path, body ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) } : undefined);
+  const data = await r.json();
+  if (!r.ok) throw new Error(data.error);
+  return data;
+}
 let sample = "";
 
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
 const list = (items) => items.length ? `<ul>${items.map((i) => `<li>${esc(i)}</li>`).join("")}</ul>` : `<p class="note">Nothing noted.</p>`;
 
-fetch("/api/status").then((r) => r.json()).then((s) => {
+api("status").then((s) => {
   sample = s.sample.diary;
-  $("mode").textContent = s.live ? "Live AI mode." : "Demo mode: shows a pre-made example summary. Add an API key to use the real AI.";
+  $("mode").textContent = STATIC ? ONLINE_NOTE : s.live ? "Live AI mode." : "Demo mode: shows a pre-made example summary. Add an API key to use the real AI.";
 });
 
 $("sample").onclick = () => { $("diary").value = sample; };
@@ -75,9 +99,7 @@ $("go").onclick = async () => {
   $("go").disabled = true; $("go").textContent = "Working…";
   $("error").hidden = true;
   try {
-    const r = await fetch("/api/run", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ diary: $("diary").value }) });
-    const data = await r.json();
-    if (!r.ok) throw new Error(data.error);
+    const data = await api("run", { diary: $("diary").value });
     $("urgent").hidden = !data.urgent;
     render(data);
   } catch (e) {
